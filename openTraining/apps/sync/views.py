@@ -1,4 +1,5 @@
 import datetime
+from collections import OrderedDict
 
 from django.db.models import Avg, Count, Sum
 from django.shortcuts import render
@@ -58,11 +59,11 @@ def mensuel(request, year=None):
     """
     data = {}
     resume = {}
-    resume_run = {}
-    resume_ride = {}
-    resume_swim = {}
-    resume_football = {}
-    resume_other = {}
+    resume_run = OrderedDict()
+    resume_ride = OrderedDict()
+    resume_swim = OrderedDict()
+    resume_football = OrderedDict()
+    resume_other = OrderedDict()
 
     if not year:
         current_date = datetime.datetime.now()
