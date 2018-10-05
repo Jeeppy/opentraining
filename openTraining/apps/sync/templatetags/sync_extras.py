@@ -103,6 +103,26 @@ def next_year(value):
     return value + relativedelta(years=1)
 
 
+@register.filter(name='previous_week')
+def previous_week(value):
+    """
+    Retire une semaine
+    :param value: date à laquelle soustraire une semaine
+    :return: nouvelle date
+    """
+    return value - relativedelta(weeks=1)
+
+
+@register.filter(name='next_week')
+def next_week(value):
+    """
+    Ajoute une semaine
+    :param value: date à laquelle additionner une semaine
+    :return: nouvelle date
+    """
+    return value + relativedelta(weeks=1)
+
+
 @register.filter(name='get_type')
 def get_type(value):
     """

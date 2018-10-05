@@ -121,3 +121,80 @@ def mensuel(request, year=None):
     data['total'] = total
 
     return render(request, 'sync/mensuel.html', data)
+
+
+def charges(request, year=None, week=None):
+    """
+    Charges hebdomadaires
+    :param request:
+    :param year:
+    :param week:
+    :return:
+    """
+    if not year:
+        current_date = datetime.datetime.now()
+        start = current_date - datetime.timedelta(days=current_date.weekday())
+    else:
+        date = "{year}-W{week}".format(year=year, week=week)
+        start = datetime.datetime.strptime(date + '-1', "%Y-W%W-%w")
+    end = start + datetime.timedelta(days=6)
+
+    activities = Activity.objects.filter(date__date__gte=start, date__date__lte=end)
+
+    resume = dict()
+    resume['swim'] = activities.filter(type=Activity.SWIM).aggregate(
+            count=Count('id'),
+            duration=Sum('elapsed_time'),
+            distance=Sum('distance'),
+            heart=Avg('average_heartrate'),
+            speed=Avg('average_speed'))
+    resume['ride'] = activities.filter(type=Activity.RIDE).aggregate(
+            count=Count('id'),
+            duration=Sum('elapsed_time'),
+            distance=Sum('distance'),
+            heart=Avg('average_heartrate'),
+            speed=Avg('average_speed'))
+    resume['run'] = activities.filter(type=Activity.RUN).aggregate(
+            count=Count('id'),
+            duration=Sum('elapsed_time'),
+            distance=Sum('distance'),
+            heart=Avg('average_heartrate'),
+            speed=Avg('average_speed'))
+    resume['football'] = activities.filter(type=Activity.FOOTBALL).aggregate(
+            count=Count('id'),
+            duration=Sum('elapsed_time'),
+            distance=Sum('distance'),
+            heart=Avg('average_heartrate'))
+    resume['other'] = activities.filter(type=Activity.OTHER).aggregate(
+            count=Count('id'),
+            duration=Sum('elapsed_time'),
+            distance=Sum('distance'),
+            heart=Avg('average_heartrate'),
+            speed=Avg('average_speed'))
+    current_week = activities.aggregate(
+            count=Count('id'),
+            duration=Sum('elapsed_time'),
+            distance=Sum('distance'),
+            heart=Avg('average_heartrate'),
+            speed=Avg('average_speed'))
+    resume['summary'] = current_week
+
+    start_last_week = start - datetime.timedelta(weeks=1)
+    end_last_week = start_last_week + datetime.timedelta(days=6)
+    last_week = Activity.objects.filter(date__date__gte=start_last_week, date__date__lte=end_last_week).aggregate(
+            count=Count('id'),
+            duration=Sum('elapsed_time'),
+            distance=Sum('distance'),
+            heart=Avg('average_heartrate'),
+            speed=Avg('average_speed'))
+
+    charges = dict()
+    charges['pourcent'] = round(
+        ((current_week.get('duration', 0) or 0) - last_week.get('duration', 0)) / last_week.get('duration', 0) * 100)\
+        if last_week.get('duration', None) else None
+    charges['duration'] = (current_week.get('duration', 0) or 0) - (last_week.get('duration', 0) or 0)
+    charges['distance'] = (current_week.get('distance', 0) or 0) - (last_week.get('distance', 0) or 0)
+
+    data = {'start': start, 'end': end, 'resume': resume, 'charges': charges}
+
+    return render(request, 'sync/charges.html', data)

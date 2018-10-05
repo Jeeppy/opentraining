@@ -1,0 +1,132 @@
+{% extends 'sync/base.html' %}
+{% load sync_extras %}
+{% load static %}
+{% load mathfilters %}
+
+{% block content %}
+    <div class="row">
+        <div class="col-md-2">
+            <a class="btn btn-primary" href="/charges/{{ start | previous_week | date:'Y/W/' }}" tabindex="-1">&laquo;</a>
+        </div>
+        <div class="col-md-8 text-center">
+            <h4>Semaine {{ start | date:"W" | capfirst }} ({{ start | date:"Y" }})</h4>
+        </div>
+        <div class="col-md-2 text-right">
+            <a class="btn btn-primary" href="/charges/{{ start | next_week | date:'Y/W/' }}">&raquo;</a>
+        </div>
+    </div>
+    <div class="opentraining-block">
+        <div class="row">
+            <div class="col-md-2"></div>
+            <div class="col-md-8 text-center">
+                <div class="row">
+                    <div class="col-md-4">
+                        <blockquote class="blockquote">
+                            <p class="mb-0">
+                                {% if charges.pourcent > 0 %}
+                                    <img class="opentraining-updown" src="{% static 'img/up.png' %}"/> +
+                                {% elif charges.pourcent < 0 %}
+                                    <img class="opentraining-updown" src="{% static 'img/down.png' %}"/> -
+                                {% endif %}
+                               {{ charges.pourcent | abs | default:'0'}}%
+                            </p>
+                        </blockquote>
+                    </div>
+                    <div class="col-md-4">
+                        <blockquote class="blockquote">
+                            <p class="mb-0">
+                               {% if charges.duration > 0 %}
+                                    <img class="opentraining-updown" src="{% static 'img/up.png' %}"/> +
+                                {% elif charges.duration < 0 %}
+                                    <img class="opentraining-updown" src="{% static 'img/down.png' %}"/> -
+                                {% endif %}
+                                {{ charges.duration  | abs | duration | default:'00:00:00' }}
+                            </p>
+                        </blockquote>
+
+                    </div>
+                    <div class="col-md-4">
+                        <blockquote class="blockquote">
+                            <p class="mb-0">
+                               {% if charges.distance > 0 %}
+                                    <img class="opentraining-updown" src="{% static 'img/up.png' %}"/> +
+                                {% elif charges.distance < 0 %}
+                                    <img class="opentraining-updown" src="{% static 'img/down.png' %}"/> -
+                                {% endif %}
+                                {{ charges.distance  | abs | distance_to_km | default:'0' }} km
+                            </p>
+                        </blockquote>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <table class="table opentraining-block">
+        <thead>
+            <tr class="text-center">
+                <th scope="col"></th>
+                <th scope="col"><img src="{% static 'img/swimming.png' %}" class="opentraining-image" alt="Natation" title="Natation"/></th>
+                <th scope="col"><img src="{% static 'img/cycling.png' %}" class="opentraining-image" alt="Vélo" title="Vélo"/></th>
+                <th scope="col"><img src="{% static 'img/running.png' %}" class="opentraining-image" alt="Course à pied" title="Course à pied"/></th>
+                <th scope="col" hidden><img src="{% static 'img/ppg.png' %}" class="opentraining-image" alt="PPG" title="PPG"/></th>
+                <th scope="col"><img src="{% static 'img/football.png' %}" class="opentraining-image" alt="Football" title="Football"/></th>
+                <th scope="col"><img src="{% static 'img/autres.png' %}" class="opentraining-image" alt="Autres" title="Autres"/></th>
+                <th scope="col"><img src="{% static 'img/sum.png' %}" class="opentraining-image" alt="Total" title="Total"/></th>
+            </tr>
+        </thead>
+        <tbody class="text-center">
+            <tr class="table-active">
+                <th scope="row"><img src="{% static 'img/count.png' %}" class="opentraining-image" alt="Nombre" title="Nombre"/></th>
+                <td>{{ resume.swim.count }}</td>
+                <td>{{ resume.ride.count }}</td>
+                <td>{{ resume.run.count }}</td>
+                <td hidden></td>
+                <td>{{ resume.football.count }}</td>
+                <td>{{ resume.other.count }}</td>
+                <td>{{ resume.summary.count }}</td>
+            </tr>
+            <tr>
+                <th scope="row"><img src="{% static 'img/duration.png' %}" class="opentraining-image" alt="Durée" title="Durée"/></th>
+                <td>{{ resume.swim.duration | duration | default:'00:00:00'}}</td>
+                <td>{{ resume.ride.duration | duration | default:'00:00:00' }}</td>
+                <td>{{ resume.run.duration | duration | default:'00:00:00' }}</td>
+                <td hidden></td>
+                <td>{{ resume.football.duration | duration | default:'00:00:00' }}</td>
+                <td>{{ resume.other.duration | duration | default:'00:00:00' }}</td>
+                <td>{{ resume.summary.duration | duration | default:'00:00:00' }}</td>
+            </tr>
+            <tr class="table-active">
+                <th scope="row"><img src="{% static 'img/distance.png' %}" class="opentraining-image" alt="Distance" title="Distance"/></th>
+                <td>{{ resume.swim.distance | distance_to_km | default:'0' }}</td>
+                <td>{{ resume.ride.distance | distance_to_km | default:'0'  }}</td>
+                <td>{{ resume.run.distance | distance_to_km | default:'0'  }}</td>
+                <td hidden></td>
+                <td>{{ resume.football.distance | distance_to_km | default:'0'  }}</td>
+                <td>{{ resume.other.distance | distance_to_km | default:'0'  }}</td>
+                <td>{{ resume.summary.distance | distance_to_km | default:'0' }}</td>
+            </tr>
+            <tr>
+                <th scope="row"><img src="{% static 'img/heart.png' %}" class="opentraining-image" alt="FC moy." title="Fréquence cardiaque moyenne"/></th>
+                <td>{{ resume.swim.heart | floatformat:"0" | default:'' }}</td>
+                <td>{{ resume.ride.heart | floatformat:"0" | default:'' }}</td>
+                <td>{{ resume.run.heart | floatformat:"0" | default:'' }}</td>
+                <td hidden></td>
+                <td>{{ resume.football.heart | floatformat:"0" | default:'' }}</td>
+                <td>{{ resume.other.heart | floatformat:"0" | default:'' }}</td>
+                <td>{{ resume.summary.heart | floatformat:"0" | default:'' }}</td>
+            </tr>
+            <tr class="table-active">
+                <th scope="row"><img src="{% static 'img/speed.png' %}" class="opentraining-image" alt="Vitesse" title="Vitesse"/></th>
+                <td>{{ resume.swim.speed | speed_to_minnat | default:'' }}</td>
+                <td>{{ resume.ride.speed | speed_to_kmh | default:'' }}</td>
+                <td>{{ resume.run.speed | speed_to_minkm | default:'' }}</td>
+                <td hidden></td>
+                <td>{{ resume.football.speed | speed_to_kmh | default:'' }}</td>
+                <td>{{ resume.other.speed | speed_to_kmh | default:'' }}</td>
+                <td>{{ resume.summary.speed | speed_to_kmh | default:'' }}</td>
+            </tr>
+        </tbody>
+    </table>
+{% endblock %}
