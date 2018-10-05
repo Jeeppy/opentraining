@@ -1,0 +1,63 @@
+{% extends 'sync/base.html' %}
+{% load sync_extras %}
+{% block content %}
+
+    <div class="row">
+        <div class="col-md-2">
+            <a class="btn btn-primary" href="/activities/{{ current_date | previous_month | date:'Y/m/' }}" tabindex="-1">&laquo;</a>
+        </div>
+        <div class="col-md-8 text-center">
+            <h4>{{ current_date | date:"F Y" | capfirst }}</h4>
+        </div>
+        <div class="col-md-2 text-right">
+            <a class="btn btn-primary" href="/activities/{{ current_date | next_month | date:'Y/m/' }}">&raquo;</a>
+        </div>
+    </div>
+
+    <div class="opentraining-block">
+        <table class="table table-hover">
+            <thead>
+                <tr>
+                    <th class="text-center">Date</th>
+                    <th class="text-center">Sport</th>
+                    <th class="text-center">Titre</th>
+                    <th class="text-center">Durée</th>
+                    <th class="text-center">Fréquence cardiaque</th>
+                    <th class="text-center">Distance</th>
+                    <th class="text-center">Allure/Vitesse</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for activity in activities %}
+                <tr>
+                    <th scope="row" class="text-center">{{ activity.date | date:"d/m/Y" }}</th>
+                    <td class="text-center">{{ activity.get_type_display }}</td>
+                    <td class="text-center">{{ activity.name }}</td>
+                    <td class="text-center">{{ activity.elapsed_time | duration }}</td>
+                    <td class="text-center">{{ activity.average_heartrate | default:'-' }}</td>
+                    <td class="text-center">{{ activity.distance | distance_to_km }}</td>
+                    <td class="text-center">
+                        {% if activity.type == 3 %}
+                            {{ activity.average_speed | speed_to_minkm | default:'-' }}
+                        {% elif activity.type == 1 %}
+                            {{ activity.average_speed | speed_to_minnat | default:'-' }}
+                        {% else %}
+                            {{ activity.average_speed | speed_to_kmh | default:'-' }}
+                        {% endif %}
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+            <tfoot>
+                <tr class="table-active">
+                    <td class="text-center"><strong>Total</strong></td>
+                    <td colspan="2" class="text-center"><strong>{{ summary.count }} activités</strong></td>
+                    <td class="text-center"><strong>{{ summary.duration | duration }}</strong></td>
+                    <td></td>
+                    <td class="text-center"><strong>{{ summary.distance | distance_to_km }}</strong></td>
+                    <td></td>
+                </tr>
+            </tfoot>
+        </table>
+    </div>
+{% endblock %}

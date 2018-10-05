@@ -1,0 +1,14 @@
+{% extends 'sync/base.html' %}
+
+{% block content %}
+    <div class="opentraining-block text-center">
+        {% if not sync %}
+            <h3>Synchroniser les activités récentes</h3>
+            <a href="/synchroniser/?sync=True" class="btn btn-primary">Démarrer</a>
+            <p class="text-muted"><small>Dernière synchronisation : {{ last | default:'aucune'}}</small></p>
+        {% else %}
+            <h3>Synchronisation terminée</h3>
+            <a href="/" class="btn btn-primary">Retour</a>
+        {% endif %}
+    </div>
+{% endblock %}

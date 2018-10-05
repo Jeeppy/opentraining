@@ -1,0 +1,213 @@
+{% extends 'sync/base.html' %}
+{% load sync_extras %}
+{% load static %}
+
+{% block content %}
+    <div class="row">
+        <div class="col-md-2">
+            <a class="btn btn-primary" href="/mensuel/{{ current_date | previous_year | date:'Y/' }}" tabindex="-1">&laquo;</a>
+        </div>
+        <div class="col-md-8 text-center">
+            <h4>{{ current_date | date:"Y" | capfirst }}</h4>
+        </div>
+        <div class="col-md-2 text-right">
+            <a class="btn btn-primary" href="/mensuel/{{ current_date | next_year | date:'Y/' }}">&raquo;</a>
+        </div>
+    </div>
+
+    <ul class="nav nav-tabs opentraining-block">
+      <li class="nav-item">
+        <a class="nav-link active" data-toggle="tab" href="#swim">Natation</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" data-toggle="tab" href="#bike">Vélo</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" data-toggle="tab" href="#run">Course à pied</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" data-toggle="tab" href="#foot">Football</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" data-toggle="tab" href="#other">Autres</a>
+      </li>
+    </ul>
+
+    <div id="myTabContent" class="tab-content">
+      <div class="tab-pane fade show active" id="swim">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th class="text-center">Mois</th>
+                    <th class="text-center">Nombre</th>
+                    <th class="text-center">Durée</th>
+                    <th class="text-center">Distance</th>
+                    <th class="text-center">Allure / Vitesse</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for month, values in resume.swim.items %}
+                    <tr>
+                        <th scope="row" class="text-center align-middle">{{ month | capfirst }}</th>
+                        <td class="text-center">{{ values.count }}</td>
+                        <td class="text-center">{{ values.duration | duration }}</td>
+                        <td class="text-center">{{ values.distance | distance_to_km }}</td>
+                        <td class="text-center">
+                            {{ values.speed | speed_to_minnat | default:'-' }}
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+            <tfoot>
+                <tr class="table-secondary text-center">
+                    <th scope="row">Total</th>
+                    <td>{{ total.1.count }}</td>
+                    <td>{{ total.1.duration | duration }}</td>
+                    <td>{{ total.1.distance | distance_to_km }}</td>
+                    <td>{{ total.1.speed | speed_to_minnat | default:'-' }}</td>
+                </tr>
+            </tfoot>
+        </table>
+      </div>
+      <div class="tab-pane fade" id="bike">
+          <table class="table">
+            <thead>
+                <tr>
+                    <th class="text-center">Mois</th>
+                    <th class="text-center">Nombre</th>
+                    <th class="text-center">Durée</th>
+                    <th class="text-center">Distance</th>
+                    <th class="text-center">Allure / Vitesse</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for month, values in resume.ride.items %}
+                        <tr>
+                            <th scope="row" class="text-center align-middle">{{ month | capfirst }}</th>
+                            <td class="text-center">{{ values.count }}</td>
+                            <td class="text-center">{{ values.duration | duration }}</td>
+                            <td class="text-center">{{ values.distance | distance_to_km }}</td>
+                            <td class="text-center">
+                                {{ values.speed | speed_to_kmh | default:'-' }}
+                            </td>
+                        </tr>
+                {% endfor %}
+            </tbody>
+          <tfoot>
+                <tr class="table-secondary text-center">
+                    <th scope="row">Total</th>
+                    <td>{{ total.2.count }}</td>
+                    <td>{{ total.2.duration | duration }}</td>
+                    <td>{{ total.2.distance | distance_to_km }}</td>
+                    <td>{{ total.2.speed | speed_to_kmh | default:'-' }}</td>
+                </tr>
+            </tfoot>
+          </table>
+      </div>
+      <div class="tab-pane fade" id="run">
+          <table class="table">
+            <thead>
+                <tr>
+                    <th class="text-center">Mois</th>
+                    <th class="text-center">Nombre</th>
+                    <th class="text-center">Durée</th>
+                    <th class="text-center">Distance</th>
+                    <th class="text-center">Allure / Vitesse</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for month, values in resume.run.items %}
+                    <tr>
+                        <th scope="row" class="text-center align-middle">{{ month | capfirst }}</th>
+                        <td class="text-center">{{ values.count }}</td>
+                        <td class="text-center">{{ values.duration | duration }}</td>
+                        <td class="text-center">{{ values.distance | distance_to_km }}</td>
+                        <td class="text-center">
+                                {{ values.speed | speed_to_minkm | default:'-' }}
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+          <tfoot>
+                <tr class="table-secondary text-center">
+                    <th scope="row">Total</th>
+                    <td>{{ total.3.count }}</td>
+                    <td>{{ total.3.duration | duration }}</td>
+                    <td>{{ total.3.distance | distance_to_km }}</td>
+                    <td>{{ total.3.speed | speed_to_minkm | default:'-' }}</td>
+                </tr>
+            </tfoot>
+          </table>
+      </div>
+      <div class="tab-pane fade" id="foot">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th class="text-center">Mois</th>
+                    <th class="text-center">Nombre</th>
+                    <th class="text-center">Durée</th>
+                    <th class="text-center">Distance</th>
+                    <th class="text-center">Allure / Vitesse</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for month, values in resume.foot.items %}
+                    <tr>
+                        <th scope="row" class="text-center align-middle">{{ month | capfirst }}</th>
+                        <td class="text-center">{{ values.count }}</td>
+                        <td class="text-center">{{ values.duration | duration }}</td>
+                        <td class="text-center">{{ values.distance | distance_to_km }}</td>
+                        <td class="text-center">
+                            {{ values.speed | speed_to_kmh | default:'-' }}
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+            <tfoot>
+                <tr class="table-secondary text-center">
+                    <th scope="row">Total</th>
+                    <td>{{ total.4.count }}</td>
+                    <td>{{ total.4.duration | duration }}</td>
+                    <td>{{ total.4.distance | distance_to_km }}</td>
+                    <td>{{ total.4.speed | speed_to_kmh | default:'-' }}</td>
+                </tr>
+            </tfoot>
+        </table>
+      </div>
+      <div class="tab-pane fade" id="other">
+          <table class="table">
+            <thead>
+                <tr>
+                    <th class="text-center">Mois</th>
+                    <th class="text-center">Nombre</th>
+                    <th class="text-center">Durée</th>
+                    <th class="text-center">Distance</th>
+                    <th class="text-center">Allure / Vitesse</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for month, values in resume.other.items %}
+                    <tr>
+                        <th scope="row" class="text-center align-middle">{{ month | capfirst }}</th>
+                        <td class="text-center">{{ values.count }}</td>
+                        <td class="text-center">{{ values.duration | duration }}</td>
+                        <td class="text-center">{{ values.distance | distance_to_km }}</td>
+                        <td class="text-center">
+                                {{ values.speed | speed_to_kmh | default:'-'}}
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+            <tfoot>
+                <tr class="table-secondary text-center">
+                    <th scope="row">Total</th>
+                    <td>{{ total.5.count }}</td>
+                    <td>{{ total.5.duration | duration }}</td>
+                    <td>{{ total.5.distance | distance_to_km }}</td>
+                    <td>{{ total.5.speed | speed_to_kmh | default:'-' }}</td>
+                </tr>
+            </tfoot>
+          </table>
+      </div>
+    </div>
+{% endblock %}
