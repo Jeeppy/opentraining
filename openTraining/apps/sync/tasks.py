@@ -51,4 +51,3 @@ def synchronization(before=None, after=None):
         created.append(activity)
     Synchronization.objects.create()
     return created
-
