@@ -28,8 +28,40 @@ def activity_list(request, month=None, year=None):
     summary = activities.aggregate(count=Count('id'), duration=Sum('elapsed_time'), distance=Sum('distance'))
 
     return render(
-        request, 'sync/activity_list.html', {
+        request, 'sync/activity_list2.html', {
             'activities': activities, 'current_date': current_date, 'summary': summary})
+
+
+def dashboard(request):
+    """
+    Dashboard d'accueil
+    :param request:
+    :return:
+    """
+    current_date = datetime.datetime.now()
+    start = current_date - datetime.timedelta(days=current_date.weekday())
+    end = start + datetime.timedelta(days=6)
+    activities = Activity.objects.filter(date__date__gte=start, date__date__lte=end)
+
+    resume = dict()
+    resume['swim'] = activities.filter(type=Activity.SWIM).aggregate(
+        duration=Sum('elapsed_time'),
+        distance=Sum('distance')
+    )
+    resume['bike'] = activities.filter(type=Activity.RIDE).aggregate(
+        duration=Sum('elapsed_time'),
+        distance=Sum('distance')
+    )
+    resume['run'] = activities.filter(type=Activity.RUN).aggregate(
+        duration=Sum('elapsed_time'),
+        distance=Sum('distance')
+    )
+
+    last_five = Activity.objects.order_by("-date")[:5]
+
+    return render(
+        request, 'sync/activity_list.html', {
+            'activities': last_five, 'resume': resume})
 
 
 def synchroniser(request):

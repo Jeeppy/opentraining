@@ -1,63 +1,131 @@
 {% extends 'sync/base.html' %}
 {% load sync_extras %}
+{% load static %}
 {% block content %}
 
     <div class="row">
-        <div class="col-md-2">
-            <a class="btn btn-primary" href="/activities/{{ current_date | previous_month | date:'Y/m/' }}" tabindex="-1">&laquo;</a>
+        <div class="col-4">
+            <div class="opentraining-panel mt-5 shadow">
+                <h1>Séance(s) du jour</h1>
+                <p></p>
+            </div>
         </div>
-        <div class="col-md-8 text-center">
-            <h4>{{ current_date | date:"F Y" | capfirst }}</h4>
+
+        <div class="col-4">
+            <div class="opentraining-panel mt-5 shadow">
+                <h1>Forme du jour</h1>
+                <div>
+                    <form>
+                        <div class="form-group">
+                            <label for="sommeil">Sommeil</label>
+                            <input type="range" class="form-control" id="sommeil" min="10" max="1000" step="10"/>
+                        </div>
+                        <div class="form-group">
+                            <label for="forme">Forme</label>
+                            <input type="range" class="form-control" id="forme" min="10" max="1000" step="10"/>
+                        </div>
+                        <div class="form-group">
+                            <label for="fatigue">Fatigue</label>
+                            <input type="range" class="form-control" id="fatigue" min="10" max="1000" step="10"/>
+                        </div>
+                        <div class="form-group">
+                            <label for="stress">Stress</label>
+                            <input type="range" class="form-control" id="stress" min="10" max="1000" step="10"/>
+                        </div>
+                    </form>
+                </div>
+            </div>
         </div>
-        <div class="col-md-2 text-right">
-            <a class="btn btn-primary" href="/activities/{{ current_date | next_month | date:'Y/m/' }}">&raquo;</a>
+
+        <!--Dernière activités -->
+        <div class="col-4">
+            <div class="opentraining-panel mt-5 shadow">
+                <h1>Dernière(s) activité(s)</h1>
+                <div class="content mt-3">
+                    {% for activity in activities %}
+                        <div class="row pb-3">
+                            <div class="ml-3">
+                                {% if activity.type == 1 %}
+                                    <img src="{% static 'img/swimming.png' %}" class="opentraining-image" alt="Natation" title="Natation"/>
+                                {% elif activity.type == 2 %}
+                                    <img src="{% static 'img/cycling.png' %}" class="opentraining-image" alt="Vélo" title="Vélo"/>
+                                {% elif activity.type == 3 %}
+                                    <img src="{% static 'img/running.png' %}" class="opentraining-image" alt="Course à pied" title="Course à pied"/>
+                                {% else %}
+                                    <img src="{% static 'img/autres.png' %}" class="opentraining-image" alt="Autres" title="Autres"/>
+                                {% endif %}
+                            </div>
+                            <div class="col-9 ml-2">
+                                <div class="opentraining-panel-body">{{ activity.name }} - {{ activity.elapsed_time_minutes }} min</div>
+                                <div class="opentraining-panel-foot">{{ activity.date | date:"d/m/Y H:i"}}</div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
         </div>
     </div>
 
-    <div class="opentraining-block">
-        <table class="table table-hover">
-            <thead>
-                <tr>
-                    <th class="text-center">Date</th>
-                    <th class="text-center">Sport</th>
-                    <th class="text-center">Titre</th>
-                    <th class="text-center">Durée</th>
-                    <th class="text-center">Fréquence cardiaque</th>
-                    <th class="text-center">Distance</th>
-                    <th class="text-center">Allure/Vitesse</th>
-                </tr>
-            </thead>
-            <tbody>
-            {% for activity in activities %}
-                <tr>
-                    <th scope="row" class="text-center">{{ activity.date | date:"d/m/Y" }}</th>
-                    <td class="text-center">{{ activity.get_type_display }}</td>
-                    <td class="text-center">{{ activity.name }}</td>
-                    <td class="text-center">{{ activity.elapsed_time | duration }}</td>
-                    <td class="text-center">{{ activity.average_heartrate | default:'-' }}</td>
-                    <td class="text-center">{{ activity.distance | distance_to_km }}</td>
-                    <td class="text-center">
-                        {% if activity.type == 3 %}
-                            {{ activity.average_speed | speed_to_minkm | default:'-' }}
-                        {% elif activity.type == 1 %}
-                            {{ activity.average_speed | speed_to_minnat | default:'-' }}
-                        {% else %}
-                            {{ activity.average_speed | speed_to_kmh | default:'-' }}
-                        {% endif %}
-                    </td>
-                </tr>
-            {% endfor %}
-            </tbody>
-            <tfoot>
-                <tr class="table-active">
-                    <td class="text-center"><strong>Total</strong></td>
-                    <td colspan="2" class="text-center"><strong>{{ summary.count }} activités</strong></td>
-                    <td class="text-center"><strong>{{ summary.duration | duration }}</strong></td>
-                    <td></td>
-                    <td class="text-center"><strong>{{ summary.distance | distance_to_km }}</strong></td>
-                    <td></td>
-                </tr>
-            </tfoot>
-        </table>
+    <div class="row">
+        <div class="col-12">
+            <div class="opentraining-panel mt-4 shadow">
+                <h1>Récapitulatif hebdomadaire</h1>
+                <div class="row">
+                    <div class="col-4">
+                        <div class="row">
+                            <div class="ml-3">
+                                <img src="{% static 'img/swimming.png' %}" class="opentraining-image" alt="Natation" title="Natation"/>
+                            </div>
+
+                            <div class="col-9">
+                                <div class="row mb-1">
+                                    <div class="col opentraining-recap-distance">{{ resume.swim.duration | duration }}</div>
+                                    <div class="col justify-content-between text-right">{{ resume.swim.distance | swim_arround | floatformat:"0" }} m</div>
+                                </div>
+                                <div class="progress" style="height: 0.5em">
+                                  <div class="progress-bar bg-info" role="progressbar" style="width: 100%" aria-valuenow="{% if resume.swim.duration > 0 %}100{% else %}0{% endif %}" aria-valuemin="0" aria-valuemax="100"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-4">
+                        <div class="row">
+                            <div class="ml-3">
+                                <img src="{% static 'img/cycling.png' %}" class="opentraining-image" alt="Vélo" title="Vélo"/>
+                            </div>
+
+                            <div class="col-9">
+                                <div class="row mb-1">
+                                    <div class="col opentraining-recap-distance">{{ resume.bike.duration | duration }}</div>
+                                    <div class="col justify-content-between text-right">{{ resume.bike.distance | distance_to_km | floatformat:"1" }} km</div>
+                                </div>
+                                <div class="progress" style="height: 0.5em">
+                                  <div class="progress-bar bg-info" role="progressbar" style="width: 100%" aria-valuenow="{% if resume.bike.duration > 0 %}100{% else %}0{% endif %}" aria-valuemin="0" aria-valuemax="100"></div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                    <div class="col-4">
+                        <div class="row">
+                            <div class="ml-3">
+                                <img src="{% static 'img/running.png' %}" class="opentraining-image" alt="Course à pied" title="Course à pied"/>
+                            </div>
+
+                            <div class="col-9">
+                                <div class="row mb-1">
+                                    <div class="col opentraining-recap-distance">{{ resume.run.duration | duration  }}</div>
+                                    <div class="col justify-content-between text-right">{{ resume.run.distance | distance_to_km | floatformat:"1" }} km</div>
+                                </div>
+                                <div class="progress" style="height: 0.5em">
+                                  <div class="progress-bar bg-info" role="progressbar" style="width: 100%" aria-valuenow="{% if resume.run.duration > 0 %}100{% else %}0{% endif %}" aria-valuemin="0" aria-valuemax="100"></div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 {% endblock %}

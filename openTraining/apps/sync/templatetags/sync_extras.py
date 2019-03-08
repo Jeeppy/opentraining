@@ -131,3 +131,13 @@ def get_type(value):
     :return:
     """
     return dict(Activity.TYPE).get(value, None)
+
+
+@register.filter(name='swim_arround')
+def swim_arround(value):
+    """
+    Retourne la distance arrondi par longueur (25m)
+    :param value: distance
+    :return: distance corrigée
+    """
+    return value // 25 * 25

@@ -18,7 +18,7 @@ class Synchronization(models.Model):
 
 class Activity(models.Model):
     """
-        Activité
+    Activité
     """
     SWIM = 1
     RIDE = 2
@@ -93,5 +93,24 @@ class Activity(models.Model):
         null=True
     )
 
+    @property
+    def elapsed_time_minutes(self):
+        return self.elapsed_time // 60
+
     class Meta:
         unique_together = ('strava_id',)
+
+
+class Wellness(models.Model):
+    """
+    Forme
+    """
+    date = models.DateTimeField(
+        verbose_name="date de l'activité"
+    )
+    value = models.IntegerField(
+        verbose_name="Valeur"
+    )
+
+    class Meta:
+        unique_together = ('date',)
