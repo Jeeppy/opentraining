@@ -21,6 +21,17 @@ def duration(value):
     return "{hours:02}:{minutes:02}:{seconds:02}".format(hours=hours, minutes=minutes, seconds=seconds)
 
 
+@register.filter(name='seconds_to_minutes')
+def seconds_to_minutes(value):
+    """
+    Convertit des secondes en minutes
+    :param value: durée en seconces
+    :return: durée en minutes
+    """
+    if not value:
+        return None
+    return value // 60
+
 @register.filter(name='distance_to_km')
 def distance_to_km(value):
     """
@@ -140,4 +151,6 @@ def swim_arround(value):
     :param value: distance
     :return: distance corrigée
     """
+    if not value:
+        return 0
     return value // 25 * 25

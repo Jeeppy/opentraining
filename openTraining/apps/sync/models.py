@@ -1,3 +1,5 @@
+import datetime
+
 from django.db import models
 from django.utils.formats import date_format, time_format
 from django.utils.translation import gettext as _
@@ -93,10 +95,6 @@ class Activity(models.Model):
         null=True
     )
 
-    @property
-    def elapsed_time_minutes(self):
-        return self.elapsed_time // 60
-
     class Meta:
         unique_together = ('strava_id',)
 
@@ -114,3 +112,45 @@ class Wellness(models.Model):
 
     class Meta:
         unique_together = ('date',)
+
+
+class Evenement(models.Model):
+    """
+    Evenement
+    """
+    intitule = models.CharField(max_length=50, verbose_name="Intitulé")
+    date_debut = models.DateField(verbose_name="Date")
+    description = models.TextField(verbose_name="Description")
+
+    class Meta:
+        abstract = True;
+
+class Seance(Evenement):
+    """
+    Séance
+    """
+    duree = models.IntegerField(verbose_name="Durée")
+    discipline = models.IntegerField(choices=Activity.TYPE, verbose_name="sport")
+
+
+class Competition(Evenement):
+    """
+    Compétition
+    """
+    lieu = models.CharField(max_length=50, verbose_name="Lieu")
+    url = models.URLField(verbose_name="URL")
+    objectif = models.IntegerField(verbose_name="Objectif")
+
+
+class Blessure(Evenement):
+    """
+    Blessure
+    """
+    date_fin = models.DateField(verbose_name="Date de fin")
+
+
+class Vacance(Evenement):
+    """
+    Vacance
+    """
+    date_fin = models.DateField(verbose_name="Date de fin")

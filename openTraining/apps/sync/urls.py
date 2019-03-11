@@ -4,7 +4,7 @@ from openTraining.apps.sync import views
 
 
 urlpatterns = [
-    url(r'^$', views.activity_list, name='activity_list'),
+    url(r'^$', views.dashboard, name='activity_list'),
     url(r'^activities/(?P<year>\d+)/(?P<month>\d+)/$', views.activity_list, name='activity_list'),
     url(r'^mensuel/$', views.mensuel, name='mensuel'),
     url(r'^dashboard/$', views.dashboard, name='dashboard'),

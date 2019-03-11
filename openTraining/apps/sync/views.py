@@ -5,7 +5,8 @@ from django.db.models import Avg, Count, Sum
 from django.shortcuts import render
 from django.utils.formats import date_format
 
-from openTraining.apps.sync.models import Activity, Synchronization
+from openTraining.apps.sync.forms import WellnessForm
+from openTraining.apps.sync.models import Activity, Synchronization, Wellness, Seance
 from openTraining.apps.sync.tasks import synchronization
 
 
@@ -59,9 +60,26 @@ def dashboard(request):
 
     last_five = Activity.objects.order_by("-date")[:5]
 
+    wellness = Wellness.objects.filter(date=current_date.date()).first()
+
+    seances = Seance.objects.filter(date_debut=datetime.datetime.now().date())
+
+    if request.method == 'POST':
+        wellness_form = WellnessForm(request.POST)
+        if wellness_form.is_valid():
+            humeur = wellness_form.cleaned_data['humeur']
+            sommeil = wellness_form.cleaned_data['sommeil']
+            musculaire = wellness_form.cleaned_data['musculaire']
+            stress = wellness_form.cleaned_data['stress']
+            fatigue = wellness_form.cleaned_data['fatigue']
+            result = (humeur + sommeil + musculaire + stress + fatigue) / 5
+            wellness = Wellness.objects.create(date=datetime.datetime.now().date(), value=result)
+    else:
+        wellness_form = WellnessForm()
+
     return render(
-        request, 'sync/activity_list.html', {
-            'activities': last_five, 'resume': resume})
+        request, 'sync/dashboard.html', {
+            'activities': last_five, 'resume': resume, 'form': wellness_form, 'wellness': wellness, 'seances': seances})
 
 
 def synchroniser(request):
