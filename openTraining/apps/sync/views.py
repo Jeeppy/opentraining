@@ -82,6 +82,15 @@ def dashboard(request):
             'activities': last_five, 'resume': resume, 'form': wellness_form, 'wellness': wellness, 'seances': seances})
 
 
+def seances(request):
+
+    data = Seance.objects.order_by('-date_debut')
+
+    return render(
+        request, 'sync/seances.html', {'seances': data}
+    )
+
+
 def synchroniser(request):
     """
     Synchronisation des activités

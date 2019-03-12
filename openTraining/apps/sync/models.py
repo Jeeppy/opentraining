@@ -123,7 +123,8 @@ class Evenement(models.Model):
     description = models.TextField(verbose_name="Description")
 
     class Meta:
-        abstract = True;
+        abstract = True
+
 
 class Seance(Evenement):
     """
