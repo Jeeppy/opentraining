@@ -6,31 +6,8 @@ from django.shortcuts import render
 from django.utils.formats import date_format
 
 from openTraining.apps.sync.forms import WellnessForm
-from openTraining.apps.sync.models import Activity, Synchronization, Wellness, Seance
+from openTraining.apps.sync.models import Activity, Synchronization, Wellness
 from openTraining.apps.sync.tasks import synchronization
-
-
-def activity_list(request, month=None, year=None):
-    """
-    Liste des activités pour un mois
-    :param year:
-    :param month:
-    :param request:
-    :return:
-    """
-    if not month and not year:
-        current_date = datetime.datetime.now()
-        month = current_date.month
-        year = current_date.year
-    else:
-        current_date = datetime.datetime(int(year), int(month), 1)
-
-    activities = Activity.objects.all().filter(date__month=month, date__year=year).order_by('-date')
-    summary = activities.aggregate(count=Count('id'), duration=Sum('elapsed_time'), distance=Sum('distance'))
-
-    return render(
-        request, 'sync/activity_list2.html', {
-            'activities': activities, 'current_date': current_date, 'summary': summary})
 
 
 def dashboard(request):
@@ -62,8 +39,6 @@ def dashboard(request):
 
     wellness = Wellness.objects.filter(date=current_date.date()).first()
 
-    seances = Seance.objects.filter(date_debut=datetime.datetime.now().date())
-
     if request.method == 'POST':
         wellness_form = WellnessForm(request.POST)
         if wellness_form.is_valid():
@@ -79,16 +54,30 @@ def dashboard(request):
 
     return render(
         request, 'sync/dashboard.html', {
-            'activities': last_five, 'resume': resume, 'form': wellness_form, 'wellness': wellness, 'seances': seances})
+            'activities': last_five, 'resume': resume, 'form': wellness_form, 'wellness': wellness})
 
 
-def seances(request):
+def journal(request, month=None, year=None):
+    """
+    Liste des activités pour un mois
+    :param year:
+    :param month:
+    :param request:
+    :return:
+    """
+    if not month and not year:
+        current_date = datetime.datetime.now()
+        month = current_date.month
+        year = current_date.year
+    else:
+        current_date = datetime.datetime(int(year), int(month), 1)
 
-    data = Seance.objects.order_by('-date_debut')
+    activities = Activity.objects.all().filter(date__month=month, date__year=year).order_by('-date')
+    summary = activities.aggregate(count=Count('id'), duration=Sum('elapsed_time'), distance=Sum('distance'))
 
     return render(
-        request, 'sync/seances.html', {'seances': data}
-    )
+        request, 'sync/journal.html', {
+            'activities': activities, 'current_date': current_date, 'summary': summary})
 
 
 def synchroniser(request):
@@ -109,7 +98,7 @@ def synchroniser(request):
     return render(request, 'sync/synchroniser.html', data)
 
 
-def mensuel(request, year=None):
+def bilan(request, year=None):
     """
     Bilan mois par mois sur une année
     :param request:
@@ -179,7 +168,7 @@ def mensuel(request, year=None):
     data['resume'] = resume
     data['total'] = total
 
-    return render(request, 'sync/mensuel.html', data)
+    return render(request, 'sync/bilan.html', data)
 
 
 def charges(request, year=None, week=None):
@@ -190,12 +179,16 @@ def charges(request, year=None, week=None):
     :param week:
     :return:
     """
+    def firstdayinweek(y, w):
+        ret = datetime.datetime.strptime('{year}-{week}-1'.format(year=y, week=w), '%Y-%W-%w')
+        if datetime.date(int(y), 1, 4).isoweekday() > 4:
+            ret -= datetime.timedelta(days=7)
+        return ret
     if not year:
         current_date = datetime.datetime.now()
         start = current_date - datetime.timedelta(days=current_date.weekday())
     else:
-        date = "{year}-W{week}".format(year=year, week=week)
-        start = datetime.datetime.strptime(date + '-1', "%Y-W%W-%w")
+        start = firstdayinweek(year, week)
     end = start + datetime.timedelta(days=6)
 
     activities = Activity.objects.filter(date__date__gte=start, date__date__lte=end)
@@ -247,13 +240,13 @@ def charges(request, year=None, week=None):
             heart=Avg('average_heartrate'),
             speed=Avg('average_speed'))
 
-    charges = dict()
-    charges['pourcent'] = round(
+    data = dict()
+    data['pourcent'] = round(
         ((current_week.get('duration', 0) or 0) - last_week.get('duration', 0)) / last_week.get('duration', 0) * 100)\
         if last_week.get('duration', None) else None
-    charges['duration'] = (current_week.get('duration', 0) or 0) - (last_week.get('duration', 0) or 0)
-    charges['distance'] = (current_week.get('distance', 0) or 0) - (last_week.get('distance', 0) or 0)
+    data['duration'] = (current_week.get('duration', 0) or 0) - (last_week.get('duration', 0) or 0)
+    data['distance'] = (current_week.get('distance', 0) or 0) - (last_week.get('distance', 0) or 0)
 
-    data = {'start': start, 'end': end, 'resume': resume, 'charges': charges}
+    data = {'start': start, 'end': end, 'resume': resume, 'charges': data}
 
     return render(request, 'sync/charges.html', data)

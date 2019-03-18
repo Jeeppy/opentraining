@@ -9,7 +9,7 @@
             <a class="btn btn-primary" href="/charges/{{ start | previous_week | date:'Y/W/' }}" tabindex="-1">&laquo;</a>
         </div>
         <div class="col-md-8 text-center">
-            <h4>Semaine {{ start | date:"W" | capfirst }} ({{ start | date:"Y" }})</h4>
+            <h4>Semaine {{ start | date:"W" | capfirst }} ({{start | date:"Y"}})</h4>
         </div>
         <div class="col-md-2 text-right">
             <a class="btn btn-primary" href="/charges/{{ start | next_week | date:'Y/W/' }}">&raquo;</a>
@@ -53,7 +53,7 @@
                                 {% elif charges.distance < 0 %}
                                     <img class="opentraining-updown" src="{% static 'img/down.png' %}"/> -
                                 {% endif %}
-                                {{ charges.distance  | abs | distance_to_km | default:'0' }} km
+                                {{ charges.distance  | abs | distance_to_km | default:'0' }} km
                             </p>
                         </blockquote>
                     </div>

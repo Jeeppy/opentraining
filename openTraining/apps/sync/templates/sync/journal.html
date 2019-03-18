@@ -4,13 +4,13 @@
 
     <div class="row">
         <div class="col-md-2">
-            <a class="btn btn-primary" href="/activities/{{ current_date | previous_month | date:'Y/m/' }}" tabindex="-1">&laquo;</a>
+            <a class="btn btn-primary" href="/journal/{{ current_date | previous_month | date:'Y/m/' }}" tabindex="-1">&laquo;</a>
         </div>
         <div class="col-md-8 text-center">
             <h4>{{ current_date | date:"F Y" | capfirst }}</h4>
         </div>
         <div class="col-md-2 text-right">
-            <a class="btn btn-primary" href="/activities/{{ current_date | next_month | date:'Y/m/' }}">&raquo;</a>
+            <a class="btn btn-primary" href="/journal/{{ current_date | next_month | date:'Y/m/' }}">&raquo;</a>
         </div>
     </div>
 
